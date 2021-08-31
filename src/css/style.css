@@ -4,20 +4,19 @@ body {
 }
 
 div#main-container {
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
   gap: 5px;
 }
 
-div.sub-container1,
-div.sub-container2 {
+div#main-container > div.sub-container1 {
   margin: 0px 10px 0px 10px;
-}
-
-div.sub-container1 {
   width: 60%;
 }
 
-div.sub-container2 {
+div#main-container > div.sub-container2 {
+  margin: 0px 10px 0px 10px;
   width: 40%;
 }
 
@@ -31,45 +30,10 @@ h2 {
   font-size: 30px;
 }
 
-input#title-input {
-  font-size: 19px;
-  padding: 5px;
-  width: 80%;
-  margin-bottom: 10px;
-}
-
 textarea#description-input {
   font-size: 17px;
   padding: 5px;
   width: 80%;
-}
-
-input#search-input {
-  font-size: 19px;
-  width: 50%;
-  margin-top: 20px;
-  padding: 5px;
-}
-
-button {
-  font-size: 19px;
-  background-color: green;
-  margin: 10px 10px 10px 0px;
-  border-radius: 5px;
-  padding: 5px;
-}
-
-button#add-button,
-button#mark-done-button {
-  display: block;
-}
-
-button#mark-done-button {
-  margin-top: 20px;
-}
-
-button#filter-button {
-  margin-left: 10px;
 }
 
 p#items-left-info {
@@ -127,14 +91,20 @@ div.pin-n-edit-container {
 }
 
 div#popup-container {
-  background-color: rgb(128, 128, 128, 0.4);
+  background-color: rgba(128, 128, 128, 0.4);
   width: 100vw;
   height: 100vh;
   position: fixed;
   top: 0px;
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
   z-index: 100;
 }
 
@@ -183,32 +153,33 @@ div.pagination-container {
   text-align: center;
 }
 
-div.pagination-container > button {
+div.pagination-container button {
   color: white;
 }
 
-div.pagination-container > button.active {
+div.pagination-container button.active {
   background-color: black;
 }
 
 @media (max-width: 900px) {
   div#main-container {
-    flex-direction: column;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
     margin: 0px 10px;
   }
-
-  div.sub-container1,
-  div.sub-container2 {
+  div#main-container > div.sub-container1,
+  div#main-container > div.sub-container2 {
     width: 100%;
     padding-right: 10px;
     margin: 0px;
   }
-
-  div.sub-container2 {
+  div#main-container > div.sub-container2 {
     margin-top: 50px;
   }
-
   div#pin-list {
     margin-bottom: 70px;
   }
 }
+/*# sourceMappingURL=style.css.map */
