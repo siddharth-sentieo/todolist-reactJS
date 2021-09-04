@@ -27,7 +27,7 @@ function Item(props) {
 
   return (
     <Fragment>
-      <li>
+      <li ref={props.reference !== undefined ? props.reference : null}>
         <div>
           {props.in === "pin" ? null : (
             <input

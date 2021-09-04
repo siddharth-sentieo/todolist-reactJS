@@ -64,6 +64,12 @@ ol > li > div {
   display: inline;
 }
 
+div.loading-div {
+  margin: 0px 15px 10px 0px;
+  font-size: 17px;
+  text-align: right;
+}
+
 p.description {
   padding: 20px;
   margin-top: 10px;

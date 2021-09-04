@@ -191,6 +191,12 @@ div.pagination-container > button.active {
   background-color: black;
 }
 
+div.loading-div {
+  margin: 0px 15px 10px 0px;
+  font-size: 17px;
+  text-align: right;
+}
+
 @media (max-width: 900px) {
   div#main-container {
     flex-direction: column;

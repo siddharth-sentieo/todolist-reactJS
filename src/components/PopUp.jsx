@@ -1,28 +1,28 @@
-import React, { useState } from "react";
+import React from "react";
 import CancelPresentationOutlinedIcon from "@material-ui/icons/CancelPresentationOutlined";
 import SaveOutlinedIcon from "@material-ui/icons/SaveOutlined";
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
-import InputBox from "./InputBox";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  changePopUpInfoTitle,
+  changePopUpInfoDescription,
+} from "../actions/changePopUpInfo";
 
 function PopUp(props) {
-  const [newText, setNewText] = useState({
-    title: props.title,
-    description: props.description,
-  });
+  const newText = useSelector((state) => state.popUpInfo);
+  const dispatch = useDispatch();
 
   function handleInputChange(event) {
     const newInputText = event.target.value;
-    setNewText((prevValue) => {
-      return { title: newInputText, description: prevValue.description };
-    });
+
+    dispatch(changePopUpInfoTitle(newInputText));
   }
 
   function handleCKEditorChange(event, ckEditor) {
     const newDescription = ckEditor.getData();
-    setNewText((prevValue) => {
-      return { title: prevValue.title, description: newDescription };
-    });
+
+    dispatch(changePopUpInfoDescription(newDescription));
   }
 
   function handleCancelClick() {
@@ -42,7 +42,7 @@ function PopUp(props) {
           onClick={handleCancelClick}
         />
         <div className="input-container">
-          <InputBox
+          <input
             id="title-input"
             type="text"
             value={newText.title}
@@ -50,7 +50,7 @@ function PopUp(props) {
             style={{ width: "50%" }}
             onChange={handleInputChange}
             category="title"
-          ></InputBox>
+          ></input>
           <div style={{ width: "97%" }}>
             <CKEditor
               editor={ClassicEditor}
