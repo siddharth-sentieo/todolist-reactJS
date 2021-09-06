@@ -1,3 +1,6 @@
+import { enablePopUp, disablePopUp } from "../actions/changePopUpStatus.js";
+import { editTodoItem } from "../actions/changeTodoItems.js";
+
 import React from "react";
 import CancelPresentationOutlinedIcon from "@material-ui/icons/CancelPresentationOutlined";
 import SaveOutlinedIcon from "@material-ui/icons/SaveOutlined";
@@ -26,12 +29,13 @@ function PopUp(props) {
   }
 
   function handleCancelClick() {
-    props.toHide();
+    dispatch(disablePopUp());
   }
 
   function handleSaveClick() {
-    props.toEdit(props.id, newText);
-    props.toHide();
+    dispatch(editTodoItem(newText, props.id));
+
+    dispatch(disablePopUp());
   }
 
   return (

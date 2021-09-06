@@ -1,13 +1,33 @@
 import React, { Fragment } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import changeFilter from "../actions/changeFilter";
+import {
+  enableFiltered,
+  disableFiltered,
+} from "../actions/changeFilteredStatus.js";
+import addFilterItems from "../actions/addFilterItems.js";
 
 function Search(props) {
   const filterText = useSelector((state) => state.filterText);
+  const items = useSelector((state) => state.items);
   const dispatch = useDispatch();
 
   function handleChange(event) {
     dispatch(changeFilter(event.target.value));
+  }
+
+  function handleClick() {
+    const filteredList = items.filter((itemObj) => {
+      if (itemObj.title.toLowerCase().includes(filterText.toLowerCase())) {
+        return true;
+      }
+      return false;
+    });
+
+    dispatch(addFilterItems(filteredList));
+    dispatch(enableFiltered());
+
+    dispatch(changeFilter(""));
   }
 
   return (
@@ -20,18 +40,14 @@ function Search(props) {
         value={filterText}
         category="search"
       ></input>
-      <button
-        onClick={() => {
-          props.toCreate(filterText);
-
-          dispatch(changeFilter(""));
-        }}
-        id="filter-button"
-        type="filter"
-      >
+      <button onClick={handleClick} id="filter-button" type="filter">
         Filter
       </button>
-      <button onClick={props.toReset} id="reset-button" type="reset">
+      <button
+        onClick={() => dispatch(disableFiltered())}
+        id="reset-button"
+        type="reset"
+      >
         Reset
       </button>
     </Fragment>

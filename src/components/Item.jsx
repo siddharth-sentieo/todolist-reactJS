@@ -1,33 +1,69 @@
+import { addPinItem, removePinItem } from "../actions/changePinItems.js";
+import { removeDoneItem } from "../actions/changeDoneItems.js";
+import { enablePopUp } from "../actions/changePopUpStatus.js";
+import createNewEditItem from "../actions/changeEditItemInPopUp.js";
+import { addTodoItem, removeTodoItem } from "../actions/changeTodoItems.js";
+import {
+  increaseCountByOne,
+  decreaseCountByOne,
+} from "../actions/changeCount.js";
+import { addDoneItem } from "../actions/changeDoneItems.js";
+
 import React, { Fragment } from "react";
 import CancelPresentationRoundedIcon from "@material-ui/icons/CancelPresentationRounded";
 import PinDropOutlinedIcon from "@material-ui/icons/PinDropOutlined";
 import EditOutlinedIcon from "@material-ui/icons/EditOutlined";
 import ReactHtmlParser from "react-html-parser";
+import { useDispatch, useSelector } from "react-redux";
 
 function Item(props) {
   const isChecked = false;
+  const dispatch = useDispatch();
+  const items = useSelector((state) => state.items);
+  const doneItems = useSelector((state) => state.doneItems);
 
   function handleChange() {
     console.log("clicked");
-    props.toSwap(props.id, props.in);
+
+    const idx = props.id;
+    if (props.in === "todo") {
+      dispatch(addDoneItem(items[idx]));
+
+      dispatch(removeTodoItem(idx));
+
+      dispatch(decreaseCountByOne());
+    } else {
+      dispatch(addTodoItem(doneItems[idx]));
+
+      dispatch(removeDoneItem(idx));
+
+      dispatch(increaseCountByOne());
+    }
   }
 
   function handlePinClick() {
-    props.toCopy(props.id);
+    dispatch(addPinItem(items[props.id]));
   }
 
   function handleCancelClick() {
-    props.toRemove(props.id, props.in);
+    if (props.in === "pin") {
+      dispatch(removePinItem(props.id));
+    } else if (props.in === "done") {
+      dispatch(removeDoneItem(props.id));
+    } else {
+      dispatch(removeTodoItem(props.id));
+    }
   }
 
   function handleEditClick() {
-    props.toShow();
-    props.toCreate(props.id, props.title, props.description);
+    dispatch(enablePopUp());
+
+    dispatch(createNewEditItem(props.title, props.description, props.id));
   }
 
   return (
     <Fragment>
-      <li ref={props.reference !== undefined ? props.reference : null}>
+      <li ref={props.reference}>
         <div>
           {props.in === "pin" ? null : (
             <input

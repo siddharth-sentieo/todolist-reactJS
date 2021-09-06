@@ -6,8 +6,10 @@ import {
   changeItemInfoDescription,
   changeItemInfoBoth,
 } from "../actions/changeItemInfo";
+import { addTodoItem } from "../actions/changeTodoItems.js";
+import { increaseCountByOne } from "../actions/changeCount.js";
 
-function Input(props) {
+function Input() {
   const item = useSelector((state) => state.itemInfo);
   const dispatch = useDispatch();
 
@@ -22,11 +24,14 @@ function Input(props) {
   }
 
   function handleClick() {
-    props.toAdd({
-      ...item,
-      datetime: "Created: " + new Date().toLocaleString(),
-    });
-    props.toIncrease();
+    dispatch(
+      addTodoItem({
+        ...item,
+        datetime: "Created: " + new Date().toLocaleString(),
+      })
+    );
+
+    dispatch(increaseCountByOne());
 
     dispatch(changeItemInfoBoth());
   }

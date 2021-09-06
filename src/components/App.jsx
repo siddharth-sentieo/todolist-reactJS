@@ -15,30 +15,9 @@ import {
   endPinLoading,
   endTodoLoading,
 } from "../actions/changeLoading";
-import {
-  increaseCountByOne,
-  initialCount,
-  decreaseCountByOne,
-} from "../actions/changeCount.js";
-import { enablePopUp, disablePopUp } from "../actions/changePopUpStatus.js";
-import {
-  enableFiltered,
-  disableFiltered,
-} from "../actions/changeFilteredStatus.js";
-import addFilterItems from "../actions/addFilterItems.js";
-import { addPinItem, removePinItem } from "../actions/changePinItems.js";
-import {
-  transferAllToDone,
-  addDoneItem,
-  removeDoneItem,
-} from "../actions/changeDoneItems.js";
-import {
-  setEmptyTodoList,
-  addTodoItem,
-  removeTodoItem,
-  editTodoItem,
-} from "../actions/changeTodoItems.js";
-import createNewEditItem from "../actions/changeEditItemInPopUp.js";
+import { initialCount } from "../actions/changeCount.js";
+import { transferAllToDone } from "../actions/changeDoneItems.js";
+import { setEmptyTodoList } from "../actions/changeTodoItems.js";
 
 function App() {
   const dispatch = useDispatch();
@@ -114,30 +93,6 @@ function App() {
     sessionStorage.setItem("pin", JSON.stringify(pinItems));
   }, [items, doneItems, pinItems]);
 
-  function addItem(itemObj) {
-    dispatch(addTodoItem(itemObj));
-  }
-
-  function increaseCount() {
-    dispatch(increaseCountByOne());
-  }
-
-  function createFilteredList(searchText) {
-    const filteredList = items.filter((itemObj) => {
-      if (itemObj.title.toLowerCase().includes(searchText.toLowerCase())) {
-        return true;
-      }
-      return false;
-    });
-
-    dispatch(addFilterItems(filteredList));
-    dispatch(enableFiltered());
-  }
-
-  function resetList() {
-    dispatch(disableFiltered());
-  }
-
   function moveToDoneList() {
     dispatch(transferAllToDone(items));
 
@@ -146,72 +101,22 @@ function App() {
     dispatch(initialCount());
   }
 
-  function moveFromOneListToAnother(idx, list) {
-    if (list === "todo") {
-      dispatch(addDoneItem(items[idx]));
-
-      dispatch(removeTodoItem(idx));
-
-      dispatch(decreaseCountByOne());
-    } else {
-      dispatch(addTodoItem(doneItems[idx]));
-
-      dispatch(removeDoneItem(idx));
-
-      dispatch(increaseCountByOne());
+  function endLoading(listIndex, list, reducerFunc) {
+    if (listIndex >= list.length) {
+      setTimeout(() => {
+        dispatch(reducerFunc());
+      }, 1000);
     }
-  }
-
-  function copyToPinList(id) {
-    dispatch(addPinItem(items[id]));
-  }
-
-  function removeItemFromList(idx, list) {
-    if (list === "pin") {
-      dispatch(removePinItem(idx));
-    } else if (list === "done") {
-      dispatch(removeDoneItem(idx));
-    } else {
-      dispatch(removeTodoItem(idx));
-    }
-  }
-
-  function hidePopUp() {
-    dispatch(disablePopUp());
-  }
-
-  function showPopUp() {
-    dispatch(enablePopUp());
-  }
-
-  function editItemInTodolist(idx, newItemObj) {
-    dispatch(editTodoItem(newItemObj, idx));
-  }
-
-  function createEditItem(idx, title, description) {
-    dispatch(createNewEditItem(title, description, idx));
   }
 
   const endTodoIndex = todoPageNumber * 3;
-  if (endTodoIndex >= items.length) {
-    setTimeout(() => {
-      dispatch(endTodoLoading());
-    }, 1000);
-  }
+  endLoading(endTodoIndex, items, endTodoLoading);
 
   const endPinIndex = pinPageNumber * 3;
-  if (endPinIndex >= pinItems.length) {
-    setTimeout(() => {
-      dispatch(endPinLoading());
-    }, 1000);
-  }
+  endLoading(endPinIndex, pinItems, endPinLoading);
 
   const endDoneIndex = donePageNumber * 3;
-  if (endDoneIndex >= doneItems.length) {
-    setTimeout(() => {
-      dispatch(endDoneLoading());
-    }, 1000);
-  }
+  endLoading(endDoneIndex, doneItems, endDoneLoading);
 
   return (
     <Fragment>
@@ -220,16 +125,14 @@ function App() {
           title={editItem.editTitle}
           description={editItem.editDescription}
           id={editItem.editId}
-          toHide={hidePopUp}
-          toEdit={editItemInTodolist}
         />
       )}
       <h1>Todo List</h1>
       <div id="main-container">
         <div className="sub-container1">
           <h2>Todos</h2>
-          <Input toAdd={addItem} toIncrease={increaseCount} />
-          <Search toCreate={createFilteredList} toReset={resetList} />
+          <Input />
+          <Search />
           {!isFiltered ? (
             <button
               onClick={moveToDoneList}
@@ -254,34 +157,17 @@ function App() {
               {!isFiltered
                 ? items.map((itemObj, index) => {
                     return index < endTodoIndex ? (
-                      index === endTodoIndex - 1 ? (
-                        <Item
-                          key={index}
-                          id={index}
-                          in="todo"
-                          title={itemObj.title}
-                          description={itemObj.description}
-                          datetime={itemObj.datetime}
-                          toSwap={moveFromOneListToAnother}
-                          toCopy={copyToPinList}
-                          toShow={showPopUp}
-                          toCreate={createEditItem}
-                          reference={lastTodoItem}
-                        />
-                      ) : (
-                        <Item
-                          key={index}
-                          id={index}
-                          in="todo"
-                          title={itemObj.title}
-                          description={itemObj.description}
-                          datetime={itemObj.datetime}
-                          toSwap={moveFromOneListToAnother}
-                          toCopy={copyToPinList}
-                          toShow={showPopUp}
-                          toCreate={createEditItem}
-                        />
-                      )
+                      <Item
+                        key={index}
+                        id={index}
+                        in="todo"
+                        title={itemObj.title}
+                        description={itemObj.description}
+                        datetime={itemObj.datetime}
+                        reference={
+                          index === endTodoIndex - 1 ? lastTodoItem : null
+                        }
+                      />
                     ) : null;
                   })
                 : filterItems.map((itemObj, index) => {
@@ -293,10 +179,6 @@ function App() {
                         title={itemObj.title}
                         description={itemObj.description}
                         datetime={itemObj.datetime}
-                        toSwap={moveFromOneListToAnother}
-                        toCopy={copyToPinList}
-                        toShow={showPopUp}
-                        toCreate={createEditItem}
                       />
                     );
                   })}
@@ -321,28 +203,15 @@ function App() {
             <ol>
               {pinItems.map((itemObj, index) => {
                 return index < endPinIndex ? (
-                  index === endPinIndex - 1 ? (
-                    <Item
-                      key={index}
-                      id={index}
-                      in="pin"
-                      title={itemObj.title}
-                      description={itemObj.description}
-                      datetime={itemObj.datetime}
-                      toRemove={removeItemFromList}
-                      reference={lastPinItem}
-                    />
-                  ) : (
-                    <Item
-                      key={index}
-                      id={index}
-                      in="pin"
-                      title={itemObj.title}
-                      description={itemObj.description}
-                      datetime={itemObj.datetime}
-                      toRemove={removeItemFromList}
-                    />
-                  )
+                  <Item
+                    key={index}
+                    id={index}
+                    in="pin"
+                    title={itemObj.title}
+                    description={itemObj.description}
+                    datetime={itemObj.datetime}
+                    reference={index === endPinIndex - 1 ? lastPinItem : null}
+                  />
                 ) : null;
               })}
               {pinLoading && <div className="loading-div">Loading...</div>}
@@ -362,30 +231,15 @@ function App() {
             <ol>
               {doneItems.map((itemObj, index) => {
                 return index < endDoneIndex ? (
-                  index === endDoneIndex - 1 ? (
-                    <Item
-                      key={index}
-                      id={index}
-                      in="done"
-                      title={itemObj.title}
-                      description={itemObj.description}
-                      datetime={itemObj.datetime}
-                      toSwap={moveFromOneListToAnother}
-                      toRemove={removeItemFromList}
-                      reference={lastDoneItem}
-                    />
-                  ) : (
-                    <Item
-                      key={index}
-                      id={index}
-                      in="done"
-                      title={itemObj.title}
-                      description={itemObj.description}
-                      datetime={itemObj.datetime}
-                      toSwap={moveFromOneListToAnother}
-                      toRemove={removeItemFromList}
-                    />
-                  )
+                  <Item
+                    key={index}
+                    id={index}
+                    in="done"
+                    title={itemObj.title}
+                    description={itemObj.description}
+                    datetime={itemObj.datetime}
+                    reference={index === endDoneIndex - 1 ? lastDoneItem : null}
+                  />
                 ) : null;
               })}
               {doneLoading && <div className="loading-div">Loading...</div>}
